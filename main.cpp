@@ -11,10 +11,10 @@ int main(int argc, char *argv[])
     qRegisterMetaType<OptionItem>();
     QCoreApplication::setOrganizationName("ceehex");
     QCoreApplication::setOrganizationDomain("ceehex.com");
-    QCoreApplication::setApplicationName("rr_launcher");
+    QCoreApplication::setApplicationName("hex_launcher");
 
     QQmlApplicationEngine engine;
-    auto globalModels = engine.singletonInstance<GlobalModels *>("rr_launcher", "GlobalModels");
+    auto globalModels = engine.singletonInstance<GlobalModels *>("hex_launcher", "GlobalModels");
     globalModels->s_singletonInstance = globalModels;
     globalModels->setPresetParser(new PresetParser);
     globalModels->setGamePresetModel(new GamePresetModel);
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("rr_launcher", "Main");
+    engine.loadFromModule("hex_launcher", "Main");
 
     return app.exec();
 }

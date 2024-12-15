@@ -8,14 +8,14 @@ import Qt.labs.platform
 import "./components"
 
 //import com.rr_launcher.globalModel
-import rr_launcher
+import hex_launcher
 
 
 Window {
     width: 800
     height: 600
     visible: true
-    title: qsTr("sup")
+    title: qsTr("hex launcher")
     color: "#242424"
 
     Connections{

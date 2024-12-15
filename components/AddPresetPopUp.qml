@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.Basic
 import Qt.labs.platform
 
-import rr_launcher
+import hex_launcher
 //import com.rr_launcher.globalModel
 
 
