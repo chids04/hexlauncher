@@ -1,0 +1,24 @@
+{
+    "classes": [
+        {
+            "classInfos": [
+                {
+                    "name": "QML.Element",
+                    "value": "anonymous"
+                }
+            ],
+            "className": "GamePreset",
+            "lineNumber": 11,
+            "object": true,
+            "qualifiedClassName": "GamePreset",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "gamepreset.h",
+    "outputRevision": 68
+}

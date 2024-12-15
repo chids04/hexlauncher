@@ -1,0 +1,103 @@
+{
+    "classes": [
+        {
+            "classInfos": [
+                {
+                    "name": "QML.Singleton",
+                    "value": "true"
+                },
+                {
+                    "name": "QML.Element",
+                    "value": "auto"
+                }
+            ],
+            "className": "GlobalModels",
+            "lineNumber": 11,
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 0,
+                    "name": "presetParser",
+                    "notify": "presetParserChanged",
+                    "read": "presetParser",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "PresetParser*",
+                    "user": false,
+                    "write": "setPresetParser"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 1,
+                    "name": "gamePresetModel",
+                    "notify": "gamePresetModelChanged",
+                    "read": "gamePresetModel",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "GamePresetModel*",
+                    "user": false,
+                    "write": "setGamePresetModel"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "index": 2,
+                    "name": "optionModel",
+                    "notify": "optionModelChanged",
+                    "read": "optionModel",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "OptionModel*",
+                    "user": false,
+                    "write": "setOptionModel"
+                }
+            ],
+            "qualifiedClassName": "GlobalModels",
+            "signals": [
+                {
+                    "access": "public",
+                    "index": 0,
+                    "name": "gamePresetModelChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 1,
+                    "name": "presetParserChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "index": 2,
+                    "name": "optionModelChanged",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "public",
+                    "index": 3,
+                    "name": "hello",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "globalmodels.h",
+    "outputRevision": 68
+}

@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/qt/qml/rr_launcher">
+    <file alias="qmldir">C:/Users/c/Documents/bs/c++/rr-launcher/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug/rr_launcher/qmldir</file>
+  </qresource>
+</RCC>
+

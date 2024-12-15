@@ -1,0 +1,10 @@
+-I
+C:/Users/c/Documents/bs/c++/rr-launcher/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug
+-I
+C:/Qt/6.8.0/llvm-mingw_64/qml
+--resource
+C:/Users/c/Documents/bs/c++/rr-launcher/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug/.qt/rcc/qmake_rr_launcher.qrc
+--resource
+C:/Users/c/Documents/bs/c++/rr-launcher/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug/.qt/rcc/apprr-launcher_raw_qml_0.qrc
+--module
+rr_launcher
