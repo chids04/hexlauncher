@@ -1,9 +1,0 @@
---resource
-C:/Users/c/Documents/bs/c++/rr-launcher/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug/.qt/rcc/qmake_rr_launcher.qrc
---resource
-C:/Users/c/Documents/bs/c++/rr-launcher/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug/.qt/rcc/apprr-launcher_raw_qml_0.qrc
-/qt/qml/rr_launcher/Main.qml
-/qt/qml/rr_launcher/components/GamePresetDelegate.qml
-/qt/qml/rr_launcher/components/CButton.qml
-/qt/qml/rr_launcher/components/ErrorPopUp.qml
-/qt/qml/rr_launcher/components/AddPresetPopUp.qml

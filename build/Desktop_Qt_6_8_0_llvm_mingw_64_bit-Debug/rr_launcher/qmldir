@@ -1,9 +1,0 @@
-module rr_launcher
-typeinfo apprr-launcher.qmltypes
-prefer :/qt/qml/rr_launcher/
-Main 1.0 Main.qml
-GamePresetDelegate 1.0 components/GamePresetDelegate.qml
-CButton 1.0 components/CButton.qml
-ErrorPopUp 1.0 components/ErrorPopUp.qml
-AddPresetPopUp 1.0 components/AddPresetPopUp.qml
-
