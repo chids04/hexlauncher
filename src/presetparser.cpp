@@ -247,7 +247,7 @@ void PresetParser::setExecutablePath(QUrl dolphin_executable)
     setDolphPath(dolphin_executable.toLocalFile());
 }
 
-void PresetParser::runGame(QString json_path)
+void PresetParser::runGame(const QString &json_path, const QString &display_name)
 {
     qDebug() << json_path;
 
@@ -261,6 +261,8 @@ void PresetParser::runGame(QString json_path)
         return;
     }
 
+    
+    savePreset(display_name, json_path);
     QStringList arguments;
     arguments << "-e" << json_path;
 

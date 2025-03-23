@@ -30,11 +30,7 @@ public:
 signals:
     void getOptions();
     void sendError(QString error_msg);
-
-
-
     void mkwiiPathChanged();
-
     void dolphPathChanged();
 
 public slots:
@@ -46,7 +42,7 @@ public slots:
     void savePreset(QString display_name, QUrl save_path);
     void setGamePath(QUrl mkwii_path);
     void setExecutablePath(QUrl dolphin_executable);
-    void runGame(QString json_path);
+    void runGame(const QString &json_path, const QString &display_name);
 
 private:
     QHash<QString, int> selected_options;

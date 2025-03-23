@@ -5,101 +5,33 @@ import QtQuick.Layouts
 import QtQuick.Controls.Basic
 import Qt.labs.platform
 
-import "./components"
-
-//import com.rr_launcher.globalModel
 import hex_launcher
 
+Item{
 
-Window {
-    width: 800
-    height: 600
-    visible: true
-    title: qsTr("hex launcher")
-    color: "#242424"
-
-    Connections{
-        target: GlobalModels.presetParser
-
-        function onSendError(error_msg) {
-            errorPopUp.openPopup(error_msg)
+    AddPresetPopUp{
+            id: addPresetPopUp
         }
-    }
 
-    ColumnLayout {
+    ColumnLayout{
         anchors.fill: parent
 
         Text{
-            Layout.alignment: Qt.AlignHCenter
-            text: "mkwii game launcher"
-            font.bold: true
-            font.pointSize: 20
-            color: "white"
-        }
-
-        CButton {
-            buttonTextBold: true
-            buttonTextSize: 9
-            buttonText: "select dolphin executable"
-            Layout.alignment: Qt.AlignHCenter
-
-            onButtonClicked: {
-                dolphinDialog.open()
-            }
-        }
-
-        Text{
-            id: dolphinPathText
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredHeight: dolphinTextMetrics.height
-            text: GlobalModels.presetParser.dolphPath
+            Layout.alignment: Qt.AlignLeft
+            text: "presets"
+            font.pointSize: 48
             font.bold: true
             color: "white"
-
-            TextMetrics {
-                id: dolphinTextMetrics
-                text: dolphinPathText.text
-            }
-
         }
-
-
-        CButton {
-            Layout.alignment: Qt.AlignHCenter
-            buttonText: "select mkwii file"
-            buttonTextSize: 9
-            buttonTextBold: true
-            onButtonClicked: {
-                mkwiiDialog.open()
-            }
-        }
-
-        Text{
-            id: mkwiiPathText
-            Layout.alignment: Qt.AlignHCenter
-            text: GlobalModels.presetParser.mkwiiPath
-            font.bold: true
-            Layout.preferredHeight: mkwiiTextMetrics.height
-            color: "white"
-
-            TextMetrics{
-                id: mkwiiTextMetrics
-                text: mkwiiPathText.text
-            }
-        }
-
-
 
         CButton{
-            buttonText: "add game preset"
-            buttonTextSize: 8
-            buttonTextColor: "white"
+            Layout.alignment: Qt.AlignLeft
+            buttonText: "+"
+            font.pointSize: 16
+            font.bold: true
 
-            onButtonClicked: {
-                addPresetPopUp.openPopup()
-            }
+            onButtonClicked: addPresetPopUp.openPopup()
         }
-
 
         GridView{
             id: presetGrid
@@ -139,6 +71,7 @@ Window {
                     required property string display_name
                     required property var option_model
                     required property string json_path
+                    required property int index
                     property bool hovering: false
                     signal hoverChanged()
 
@@ -159,6 +92,7 @@ Window {
                             font.pointSize: 14
 
                         }
+                        
                         ListView{
                             id: optionList
                             Layout.fillWidth: true
@@ -202,7 +136,7 @@ Window {
                                         anchors.fill: parent
                                         Text{
                                             id: comboLabel
-                                            Layout.preferredWidth: 90
+                                            Layout.preferredWidth: 100
                                             text: optionDelegate.choiceName + ":"
                                             color: "white"
                                         }
@@ -332,7 +266,7 @@ Window {
                                 Layout.alignment: Qt.AlignLeft
 
                                 onButtonClicked : {
-                                    GlobalModels.presetParser.runGame(presetDelegate.json_path)
+                                    GlobalModels.presetParser.runGame(presetDelegate.json_path, presetDelegate.display_name)
                                 }
                             }
 
@@ -417,62 +351,7 @@ Window {
                 }
 
             }
-        }
-
-        // Item {
-        //     Layout.fillHeight: true
-        // }
-    }
-
-
-    FileDialog {
-        id: dolphinDialog
-        title: "select path to dolphin executable"
-        onAccepted: {
-            GlobalModels.presetParser.setExecutablePath(file)
-        }
-    }
-
-
-
-
-    FileDialog {
-        id: mkwiiDialog
-        property bool fileAdded: false
-        title: "select mkwii game file"
-
-        onAccepted: {
-            GlobalModels.presetParser.setGamePath(file)
-        }
-
+            }
     }
     
-    FileDialog{
-        id: savePresetDialog
-        title: "select save location"
-    	property string presetName;
-        
-        onAccepted: {
-            if(GlobalModels.presetParser.mkwiiPath == ""){
-                errorPopUp.openPopup("please select mkwii game file")
-            }
-            else{
-                GlobalModels.presetParser.writeToJson(GlobalModels.presetParser.mkwiiPath, savePresetDialog.file, presetName)
-            }
-
-        }
-
-        function savePreset(preset_name){
-            savePresetDialog.presetName = preset_name
-        }
-    }
-
-    ErrorPopUp{
-        id: errorPopUp
-    }
-
-    AddPresetPopUp{
-        id: addPresetPopUp
-    }
-
 }

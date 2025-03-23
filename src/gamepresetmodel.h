@@ -28,6 +28,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     QVector<GamePreset*> getGamePresets() const;
     void updateJsonPath(int index, QString &json_path);
+    
 
 public slots:
     void setOptionChoice(int choice_idx, QString preset_name, int option_idx);

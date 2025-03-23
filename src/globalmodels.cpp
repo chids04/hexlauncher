@@ -1,4 +1,5 @@
 #include "globalmodels.h"
+#include "updater.h"
 
 
 // GlobalModels &GlobalModels::instance()
@@ -39,6 +40,21 @@ void GlobalModels::hello()
     qDebug() << "hello";
 }
 
+void GlobalModels::onUpdaterFileSize(qint64 size) {
+    qint64 sizeInMB = size / (1024 * 1024);
+    QString m_fileSizeMB = QString::number(sizeInMB, 'f', 2) + " MB";
+
+    emit modFileSize(m_fileSizeMB);
+}
+
+void GlobalModels::onBytesDownloaded(qint64 size) {
+    qint64 sizeInMB = size / (1024 * 1024);
+    QString m_fileSizeMB = QString::number(sizeInMB, 'f', 2) + " MB";
+
+    emit downloadProgress(m_fileSizeMB);
+}
+
+
 OptionModel *GlobalModels::optionModel() const
 {
     return m_optionModel;
@@ -51,3 +67,17 @@ void GlobalModels::setOptionModel(OptionModel *newOptionModel)
     m_optionModel = newOptionModel;
     emit optionModelChanged();
 }
+
+RetroRewind::Updater *GlobalModels::updater() const {
+    return m_updater;
+}
+
+void GlobalModels::setUpdater(RetroRewind::Updater *newUpdater) {
+    if(newUpdater == m_updater)    {
+        return;
+    }
+    m_updater = newUpdater;
+    connect(m_updater, &RetroRewind::Updater::updateFileSize, this, &GlobalModels::onUpdaterFileSize);
+    emit updaterChanged();
+}
+

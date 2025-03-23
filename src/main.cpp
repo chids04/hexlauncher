@@ -3,10 +3,12 @@
 
 #include "globalmodels.h"
 #include "gamepresetmodel.h"
+#include "updater.h"
 
 
 int main(int argc, char *argv[])
 {
+
     QGuiApplication app(argc, argv);
     qRegisterMetaType<OptionItem>();
     QCoreApplication::setOrganizationName("ceehex");
@@ -14,12 +16,15 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("hex_launcher");
 
     QQmlApplicationEngine engine;
+
     auto globalModels = engine.singletonInstance<GlobalModels *>("hex_launcher", "GlobalModels");
     globalModels->s_singletonInstance = globalModels;
     globalModels->setPresetParser(new PresetParser);
     globalModels->setGamePresetModel(new GamePresetModel);
 
-    //qmlRegisterSingletonInstance("com.rr_launcher.globalModel", 1, 0, "GlobalModels", &GlobalModels::instance());
+    RetroRewind::Updater *updater = new RetroRewind::Updater(globalModels->presetParser());
+    globalModels->setUpdater(updater);
+
 
     QObject::connect(
         &engine,
