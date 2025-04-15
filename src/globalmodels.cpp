@@ -54,6 +54,10 @@ void GlobalModels::onBytesDownloaded(qint64 size) {
     emit downloadProgress(m_fileSizeMB);
 }
 
+QString GlobalModels::getLocalPath(const QUrl &path) {
+    return path.toLocalFile();
+}
+
 
 OptionModel *GlobalModels::optionModel() const
 {
@@ -79,5 +83,18 @@ void GlobalModels::setUpdater(RetroRewind::Updater *newUpdater) {
     m_updater = newUpdater;
     connect(m_updater, &RetroRewind::Updater::updateFileSize, this, &GlobalModels::onUpdaterFileSize);
     emit updaterChanged();
+}
+
+GamesModel *GlobalModels::gamesModel() const {
+    return m_gamesModel;
+}
+
+void GlobalModels::setGamesModel(GamesModel *newGamesModel) {
+    if(newGamesModel == m_gamesModel){
+        return;
+    }
+
+    m_gamesModel = newGamesModel;
+    emit gamesModelChanged();
 }
 

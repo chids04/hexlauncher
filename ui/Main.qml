@@ -27,6 +27,7 @@ Window {
 
         onSettingsClicked: content.push("qrc:/qt/qml/hex_launcher/ui/views/Settings.qml")
         onPresetsClicked: content.push("qrc:/qt/qml/hex_launcher/ui/views/Presets.qml")
+        onGamesClicked: content.push("qrc:/qt/qml/hex_launcher/ui/views/Games.qml")
 
         anchors {
             left: parent.left

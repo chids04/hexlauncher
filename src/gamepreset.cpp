@@ -1,8 +1,8 @@
 #include "gamepreset.h"
 
 #include <QSettings>
-GamePreset::GamePreset(QString &display_name, QString &sd_root, OptionModel *option_model, QString &section_name, QString &xml_path, QString json_path, QObject *parent)
-    : QObject(parent), display_name(display_name), sd_root(sd_root), option_model(option_model), section_name(section_name), xml_path(xml_path), json_path(json_path){}
+GamePreset::GamePreset(QString &display_name, QString &sd_root, OptionModel *option_model, QString &section_name, QString &xml_path, int index, QString json_path, QObject *parent)
+    : QObject(parent), display_name(display_name), sd_root(sd_root), option_model(option_model), section_name(section_name), xml_path(xml_path), json_path(json_path), gameIndex(index){}
 
 QString GamePreset::getRoot() const
 {
@@ -29,6 +29,10 @@ QString GamePreset::getJsonPath() const
     return json_path;
 }
 
+int GamePreset::getGameIndex() const {
+    return gameIndex;
+}
+
 void GamePreset::setJsonPath(QString &newJsonPath)
 {
     json_path = newJsonPath;
@@ -46,6 +50,7 @@ void GamePreset::savePreset()
     settings.setValue("sdRoot", sd_root);
     settings.setValue("xmlPath", xml_path);
     settings.setValue("jsonPath", json_path);
+    settings.setValue("gameIndex", gameIndex);
 
     //getting optionmodel
     settings.beginWriteArray("options");
@@ -58,6 +63,10 @@ void GamePreset::savePreset()
     settings.endGroup();
     settings.endGroup();
 
+}
+
+void GamePreset::setGameIndex(int index) {
+    gameIndex = index;
 }
 
 OptionModel *GamePreset::getOptionModel() const

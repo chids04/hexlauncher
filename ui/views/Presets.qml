@@ -21,7 +21,7 @@ Item{
             text: "presets"
             font.pointSize: 48
             font.bold: true
-            color: "white"
+            color: "grey"
         }
 
         CButton{
@@ -40,8 +40,8 @@ Item{
             Layout.margins: 5
             model: GlobalModels.gamePresetModel
 
-            cellWidth: 250
-            cellHeight: 300
+            cellWidth: 400
+            cellHeight: 350
             clip: true
 
 
@@ -63,7 +63,7 @@ Item{
             delegate: Component{
                 Rectangle{
                     id: presetDelegate
-                    color: "#2e2e2e"
+                    color: "#222222"
                     width: presetGrid.cellWidth-8
 
                     height: presetGrid.cellHeight-8
@@ -72,6 +72,8 @@ Item{
                     required property var option_model
                     required property string json_path
                     required property int index
+                    required property int gameIndex
+
                     property bool hovering: false
                     signal hoverChanged()
 
@@ -242,6 +244,8 @@ Item{
 
                                         }
 
+                                        
+
                                         Connections{
                                             target: GlobalModels.presetParser
 
@@ -255,8 +259,47 @@ Item{
                             }
                         }
 
+                        Text{
+                            visible: GlobalModels.gamesModel.rowCount() == 0
+                            Layout.alignment: Qt.AlignHCenter
+                            text: "add game from sidebar first"
+                            color: "white"
+                            font.bold: true
+                        }
+                        RowLayout {
+                            Layout.alignment: Qt.AlignHCenter
+
+                            Text {
+                                text: "base game"
+                                color: "white"
+                            }
+
+                            CCombobox{
+                                id: gameSelector
+                                comboModel: GlobalModels.gamesModel
+                                clip: true
+                                comboTextRole: "fileName"
+                                comboIndex: {
+                                    if(presetDelegate.gameIndex >= GlobalModels.gamesModel.rowCount()){
+                                        return -1
+                                    }
+                                    else{
+                                        return presetDelegate.gameIndex
+                                    }
+                                }
+
+                                Layout.preferredWidth: 100
+
+                                property string selectedItem
+
+                                onActivated : (index) => {
+                                    GlobalModels.gamePresetModel.setGamePath(presetDelegate.index, index)
+                                }
+                            }
+                        }
+
                         RowLayout{
-                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignHCenter
                             Layout.preferredHeight: childrenRect.height
 
                             CButton{
@@ -266,7 +309,10 @@ Item{
                                 Layout.alignment: Qt.AlignLeft
 
                                 onButtonClicked : {
-                                    GlobalModels.presetParser.runGame(presetDelegate.json_path, presetDelegate.display_name)
+                                    var status = GlobalModels.presetParser.runGame(presetDelegate.json_path, presetDelegate.display_name, presetDelegate.gameIndex)
+                                    if(status == 1){
+                                        saveDialog.openDialog(presetDelegate.display_name)
+                                    }
                                 }
                             }
 
@@ -279,7 +325,29 @@ Item{
                                 onButtonClicked: {
                                 //emit cpp signal from here, then add connection
                                 //GlobalModels.presetParser.savePreset(display_name)
-                                saveDialog.openDialog(presetDelegate.display_name)
+
+                                if(presetDelegate.json_path != ""){
+                                    console.log(presetDelegate.json_path)
+                                    var status = GlobalModels.presetParser.updatePreset(presetDelegate.display_name, presetDelegate.json_path, presetDelegate.gameIndex)
+
+                                    if(status == 1){
+                                        saveDialog.openDialog(presetDelegate.display_name)
+                                    }
+                                }
+                                else{
+                                    saveDialog.openDialog(presetDelegate.display_name)
+                                }
+
+                                }
+                            }
+
+                            CButton{
+                                id: saveLocation
+                                buttonText: "change save location"
+                                buttonTextSize: 8
+
+                                onButtonClicked : {
+                                    saveDialog.openDialog(presetDelegate.display_name, true)
                                 }
                             }
 
@@ -291,11 +359,25 @@ Item{
                             id: saveDialog
                             title: "select save path"
                             property string presetName
+                            property bool onlyPath: false
+
                             onAccepted : {
-                                GlobalModels.presetParser.savePreset(presetName, folder)
+                                if(onlyPath){
+                                    GlobalModels.gamePresetModel.setJsonPath(presetName, folder)
+                                }
+                                else{
+                                    var status = GlobalModels.presetParser.savePreset(presetName, folder, presetDelegate.gameIndex)
+                                }
                             }
 
-                            function openDialog(preset_name){
+                            function openDialog(preset_name, saveOnlyPath=false){
+                                if(saveOnlyPath){
+                                    onlyPath = true
+                                }
+                                else{
+                                    onlyPath = false
+                                }
+
                                 presetName = preset_name
                                 saveDialog.open()
 
@@ -351,7 +433,9 @@ Item{
                 }
 
             }
-            }
+        }
+
+        
     }
     
 }

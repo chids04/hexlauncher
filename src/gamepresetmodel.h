@@ -18,7 +18,8 @@ public:
         SDRole,
         OptionModelRole,
         SectionNameRole,
-        JsonPathRole
+        JsonPathRole,
+        GameIndexRole
     };
 
     void addGamePreset(GamePreset *game_preset);
@@ -34,6 +35,8 @@ public slots:
     void setOptionChoice(int choice_idx, QString preset_name, int option_idx);
     bool isDuplicate(QString name);
     void deletePreset(QString preset_name);
+    void setGamePath(int presetIndex, int gameIndex);
+    void setJsonPath(const QString &name, const QUrl &path);
 
 private:
     QVector<GamePreset*> game_presets;

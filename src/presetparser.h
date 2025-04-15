@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <QtQml/qqmlregistration.h>
 
+#include "gamesmodel.h"
 #include "optionitem.h"
 
 class PresetParser : public QObject
@@ -20,7 +21,7 @@ class PresetParser : public QObject
     Q_PROPERTY(QString dolphPath READ dolphPath WRITE setDolphPath NOTIFY dolphPathChanged)
 
 public:
-    explicit PresetParser(QObject *parent = nullptr);
+    explicit PresetParser(GamesModel *gamesModel, QObject *parent = nullptr);
     QString mkwiiPath() const;
     void setMkwiiPath(const QString &newMkwiiPath);
 
@@ -39,10 +40,11 @@ public slots:
     void addOption(QString option, int index);
     void collectOptions();
     void printHello();
-    void savePreset(QString display_name, QUrl save_path);
+    int savePreset(const QString &display_name, const QUrl &save_path, int gameIndex);
+    int updatePreset(const QString &display_name, const QString &file_path, int gameIndex);
     void setGamePath(QUrl mkwii_path);
     void setExecutablePath(QUrl dolphin_executable);
-    void runGame(const QString &json_path, const QString &display_name);
+    int runGame(const QString &json_path, const QString &display_name, int gameIndex);
 
 private:
     QHash<QString, int> selected_options;
@@ -50,6 +52,8 @@ private:
 
     QString m_mkwiiPath;
     QString m_dolphPath;
+
+    GamesModel *gamesModel;
 };
 
 #endif // PRESETPARSER_H

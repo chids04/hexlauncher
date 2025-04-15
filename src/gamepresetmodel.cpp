@@ -2,6 +2,7 @@
 #include "optionmodel.h"
 
 #include <QSettings>
+#include <QUrl>
 
 GamePresetModel::GamePresetModel(QObject *parent) : QAbstractListModel(parent) {
     QSettings settings;
@@ -25,6 +26,7 @@ GamePresetModel::GamePresetModel(QObject *parent) : QAbstractListModel(parent) {
         QString sdRoot = settings.value("sdRoot").toString();
         QString xmlPath = settings.value("xmlPath").toString();
         QString jsonPath = settings.value("jsonPath").toString();
+        int gameIndex = settings.value("gameIndex", -1).toInt();
 
         // Read options
         QVector<std::shared_ptr<OptionItem>> options;
@@ -40,7 +42,7 @@ GamePresetModel::GamePresetModel(QObject *parent) : QAbstractListModel(parent) {
         OptionModel *optionModel = new OptionModel();
         optionModel->setOptions(options);
 
-        GamePreset *gamePreset = new GamePreset(displayName, sdRoot, optionModel, sectionName, xmlPath, jsonPath);
+        GamePreset *gamePreset = new GamePreset(displayName, sdRoot, optionModel, sectionName, xmlPath, gameIndex, jsonPath);
 
         // Add to the model
         addGamePreset(gamePreset);
@@ -109,6 +111,10 @@ QVariant GamePresetModel::data(const QModelIndex &index, int role) const
     case JsonPathRole:
         return game_preset->getJsonPath();
         break;
+    
+    case GameIndexRole:
+        return game_preset->getGameIndex();
+        break;
 
     default:
         qWarning() << "Invalid role passed to data method of Option Model";
@@ -124,6 +130,7 @@ QHash<int, QByteArray> GamePresetModel::roleNames() const
     roles[SDRole] = "sd_root";
     roles[OptionModelRole] = "option_model";
     roles[JsonPathRole] = "json_path";
+    roles[GameIndexRole] = "gameIndex";
 
     return roles;
 }
@@ -149,6 +156,7 @@ void GamePresetModel::updateJsonPath(int index, QString &json_path)
 
     qDebug() << "Updated json_path for preset:" << game_preset->getDisplayName() << json_path;
 }
+
 
 void GamePresetModel::setOptionChoice(int choice_idx, QString preset_name, int chosen_choice_idx)
 {
@@ -197,4 +205,34 @@ void GamePresetModel::deletePreset(QString preset_name)
     }
 
     qWarning() << "Preset with name" << preset_name << "not found in the model.";
+}
+
+void GamePresetModel::setGamePath(int presetIndex, int gameIndex) {
+    if(presetIndex < 0 || presetIndex > game_presets.size()){
+        return;
+    }
+
+    game_presets[presetIndex]->setGameIndex(gameIndex);
+
+    emit dataChanged(this->index(presetIndex), this->index(presetIndex));
+}
+
+void GamePresetModel::setJsonPath(const QString &name, const QUrl &path) {
+    int index = -1;
+    for (int i = 0; i < game_presets.size(); ++i) {
+        if (game_presets[i]->getDisplayName() == name) {
+            index = i;
+            break;
+        }
+    }
+
+    // If preset not found, log a warning and return
+    if (index == -1) {
+        qWarning() << "Preset with name" << name << "not found in the model.";
+        return;
+    }
+
+    // Convert QUrl to QString and update the JSON path
+    QString jsonPath = path.toLocalFile();
+    updateJsonPath(index, jsonPath);
 }

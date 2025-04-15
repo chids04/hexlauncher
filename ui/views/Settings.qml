@@ -17,7 +17,7 @@ Item{
             font.pointSize: 48
             text: "settings"
             font.bold: true
-            color: "white"
+            color: "grey"
         }
         RowLayout{
             Layout.fillWidth: true

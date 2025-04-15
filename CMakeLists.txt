@@ -33,6 +33,7 @@ qt_add_qml_module(apphex-launcher
         ui/components/ErrorPopUp.qml
         ui/components/AddPresetPopUp.qml
         ui/components/Sidebar.qml
+        ui/components/CCombobox.qml
 
         ui/views/Presets.qml
         ui/views/Games.qml
@@ -55,11 +56,25 @@ qt_add_qml_module(apphex-launcher
         src/optionitem.h src/optionitem.cpp
         src/RRUpdater/updater.cpp
         src/RRUpdater/updater.h
+        src/gamesmodel.h
+        src/gamesmodel.cpp
 )
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
+if(WIN32)
+    add_custom_target(kill_apphex_launcher
+        COMMAND taskkill /IM apphex-launcher.exe /F || exit 0
+        COMMENT "Killing previous instance of apphex-launcher.exe"
+    )
+else()  # Linux/macOS
+    add_custom_target(kill_apphex_launcher
+        COMMAND killall -9 apphex-launcher || true
+        COMMENT "Killing previous instance of apphex-launcher"
+    )
+endif()
+
+# Make the apphex-launcher target depend on the kill target
+add_dependencies(apphex-launcher kill_apphex_launcher)
+
 
 target_link_libraries(apphex-launcher
     PRIVATE Qt6::Quick Qt6::Widgets qmicroz
@@ -69,9 +84,3 @@ target_include_directories(apphex-launcher PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RRUpdater)
 
-include(GNUInstallDirs)
-install(TARGETS apphex-launcher
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)

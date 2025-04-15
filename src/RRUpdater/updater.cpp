@@ -33,7 +33,7 @@ void Updater::parseAndSaveXml() {
     QString preset_path = parentDir.absolutePath();
     
     parser->parseRiivoXML(QUrl::fromLocalFile(absoluteXmlPath), "Retro Rewind");
-    parser->savePreset("Retro Rewind", QUrl::fromLocalFile(preset_path));
+    //parser->savePreset("Retro Rewind", QUrl::fromLocalFile(preset_path));
 }
 
 void Updater::getVersion() {

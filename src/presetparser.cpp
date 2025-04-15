@@ -1,5 +1,6 @@
 #include "presetparser.h"
 #include "gamepreset.h"
+#include "gamepresetmodel.h"
 #include "optionmodel.h"
 #include "globalmodels.h"
 #include "optionitem.h"
@@ -17,7 +18,10 @@
 #include <QProcess>
 #include <QSettings>
 
-PresetParser::PresetParser(QObject *parent) : QObject(parent) {
+PresetParser::PresetParser(GamesModel *gamesModel, QObject *parent) :
+    QObject(parent), gamesModel(gamesModel) 
+{
+
     QSettings settings;
 
     setMkwiiPath(settings.value("global/mkwiiPath", "").toString());
@@ -104,9 +108,12 @@ void PresetParser::writeToJson(QString game_path, QString save_location, QString
     QJsonDocument json_doc(root_object);
 
     QString preset_path = QDir(save_location).absoluteFilePath(preset_name + ".json");
+
+    qDebug() << preset_path;
     QFile file(preset_path);
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning() << "Failed to open json file for writing:" << file.errorString();
+        file.close();
         return;
     }
     file.write(json_doc.toJson(QJsonDocument::Indented));
@@ -222,19 +229,72 @@ void PresetParser::printHello()
     qDebug() << "hello";
 }
 
-void PresetParser::savePreset(QString display_name, QUrl save_path)
+int PresetParser::savePreset(const QString &display_name, const QUrl &save_path, int gameIndex)
 {
-    if(m_mkwiiPath == ""){
-        emit sendError("please select mkwii game path");
-        return;
+    if(gameIndex == -1){
+        emit sendError("please select game from drop down");
+        return -1;
     }
 
-    if(!save_path.isEmpty()){
-        writeToJson(m_mkwiiPath, save_path.toLocalFile(), display_name);
+    QString file_path = save_path.toLocalFile();
+    QString game_path = gamesModel->getFilePath(gameIndex);
+    QFileInfo fileInfo = QFileInfo(file_path);
+    QFileInfo gameInfo = QFileInfo(game_path);
+    
+    if(!file_path.isEmpty()){
+        if(!gameInfo.exists() || !gameInfo.isFile()){
+            emit sendError("invalid game path, please select another one or create a new one");
+            return -1;
+        }
+        else if(fileInfo.exists() && fileInfo.isFile()){
+            writeToJson(game_path, fileInfo.dir().absolutePath(), display_name);
+        }
+        else if(fileInfo.exists() && fileInfo.isDir()){
+            writeToJson(game_path, fileInfo.absoluteFilePath(), display_name);
+        }
+        else{
+        }
+    }
+    else{
+        return 1;
     }
 
+    return 0;
 
 
+
+}
+
+int PresetParser::updatePreset(const QString &display_name, const QString &file_path, int gameIndex) {
+    if(gameIndex == -1){
+        emit sendError("please select game from drop down");
+        return -1;
+    }
+
+    QString game_path = gamesModel->getFilePath(gameIndex);
+    QFileInfo gameInfo = QFileInfo(game_path);
+    QFileInfo fileInfo = QFileInfo(file_path);
+    
+    if(!file_path.isEmpty()){
+        if(!gameInfo.exists() || !gameInfo.isFile()){
+            emit sendError("invalid game path, please select another one or create a new one");
+            return -1;
+        }
+        else if(fileInfo.exists() && fileInfo.isFile()){
+            writeToJson(game_path, fileInfo.dir().absolutePath(), display_name);
+        }
+        else if(fileInfo.exists() && fileInfo.isDir()){
+            writeToJson(game_path, fileInfo.absoluteFilePath(), display_name);
+        }
+        else{
+            return 1;
+        }
+    }
+    else{
+        return 1;
+    }
+
+    return 0;
 }
 
 void PresetParser::setGamePath(QUrl mkwii_path)
@@ -247,22 +307,23 @@ void PresetParser::setExecutablePath(QUrl dolphin_executable)
     setDolphPath(dolphin_executable.toLocalFile());
 }
 
-void PresetParser::runGame(const QString &json_path, const QString &display_name)
+int PresetParser::runGame(const QString &json_path, const QString &display_name, int gameIndex)
 {
     qDebug() << json_path;
 
     if(m_dolphPath == ""){
-        emit sendError("select dolphin executable path");
-        return;
+        emit sendError("select dolphin executable path in settings");
+        return 2;
     }
 
     if(json_path == ""){
         emit sendError("save preset before running");
-        return;
+        
+        return 1;
     }
 
     
-    savePreset(display_name, json_path);
+    savePreset(display_name, json_path, gameIndex);
     QStringList arguments;
     arguments << "-e" << json_path;
 
@@ -270,7 +331,7 @@ void PresetParser::runGame(const QString &json_path, const QString &display_name
 
     if(!success){
         emit sendError("failed to start game, check dolphin executable path");
-        return;
+        return -1;
     }
 }
 

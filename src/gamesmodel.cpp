@@ -1,5 +1,6 @@
 #include "gamesmodel.h"
 
+
 GamesModel::GamesModel(QObject *parent)
     : QAbstractListModel(parent)
 {
@@ -37,6 +38,31 @@ void GamesModel::addFile(const QString &fileName, const QString &filePath) {
     beginInsertRows(QModelIndex(), m_files.size(), m_files.size());
     m_files.append({fileName, filePath});
     endInsertRows();
+}
+
+void GamesModel::updateFile(int index, const QString &fileName, const QString &filePath) {
+    if(index >= m_files.size() || index < 0){
+        return;
+    }
+
+    FileEntry entry = {};
+    entry.fileName = fileName;
+    entry.filePath = filePath;
+
+
+
+    beginResetModel();
+    m_files[index] = entry;
+    endResetModel();
+}
+
+QString GamesModel::getFilePath(int index) {
+    if(index < 0 || index >= m_files.size()){
+        return "";
+    }
+
+    return m_files[index].filePath;
+
 }
 
 void GamesModel::clear() {

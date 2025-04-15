@@ -10,6 +10,9 @@ RoundButton {
     width: textMetrics.width + 2 * customButton.padding
     height: textMetrics.height + 2 * customButton.padding
 
+    implicitWidth: width
+    implicitHeight: height
+
     radius: 20
     padding:20
 
@@ -26,7 +29,8 @@ RoundButton {
     contentItem: Text{
         id: contentText
         text: "ButtonText"
-        anchors.verticalCenter: parent.verticalCenter
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         font.pointSize: 12
         color: "white"
 

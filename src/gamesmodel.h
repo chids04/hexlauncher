@@ -4,6 +4,7 @@
 #include <QString>
 #include <QVector>
 #include <qqmlintegration.h>
+#include <QUrl>
 
 struct FileEntry {
     QString fileName;
@@ -28,6 +29,8 @@ public:
 
 public slots:
     void addFile(const QString &fileName, const QString &filePath);
+    void updateFile(int index, const QString &fileName, const QString &filePath);
+    QString getFilePath(int index);
     void clear();
 
 private:

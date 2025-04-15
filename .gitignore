@@ -2,3 +2,4 @@ build/
 .qmlls.ini
 CMakeLists.txt.user
 devlogs
+.cache/

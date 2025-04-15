@@ -14,15 +14,17 @@ class GamePreset : public QObject
     QML_ANONYMOUS
 
 public:
-    explicit GamePreset(QString &display_name, QString &sd_root, OptionModel *optionModel, QString &section_name, QString &xml_path, QString json_path = "", QObject *parent = nullptr);
+    explicit GamePreset(QString &display_name, QString &sd_root, OptionModel *optionModel, QString &section_name, QString &xml_path, int index = -1, QString json_path = "", QObject *parent = nullptr);
     QString getRoot() const;
     QString getDisplayName() const;
     QString getSectionName() const;
     QString getXmlPath() const;
     QString getJsonPath() const;
+    int getGameIndex() const;
     OptionModel* getOptionModel() const;
     void setJsonPath(QString &newJsonPath);
     void savePreset();
+    void setGameIndex(int index);
 private:
     QString sd_root;
     QString display_name;
@@ -30,6 +32,7 @@ private:
     QString section_name;
     QString xml_path;
     QString json_path;
+    int gameIndex = -1;
 
 
 
