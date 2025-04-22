@@ -201,6 +201,8 @@ void Updater::fetchDeleteList() {
     connect(&manager, &QNetworkAccessManager::finished, this, &Updater::handleDeleteListReq);
     QNetworkRequest req((QUrl(DELETE_URL)));
     manager.get(req);
+
+    qDebug() << "hello";
 }
 
 void Updater::handleDeleteListReq(QNetworkReply *reply) {
