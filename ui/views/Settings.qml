@@ -3,6 +3,8 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtQuick.Controls.Basic
 
+import hex_launcher
+
 Item{
     ColumnLayout{
 
@@ -54,11 +56,16 @@ Item{
                 buttonText: "select path"
             }
 
+            CButton {
+                buttonText: "save"
+                onButtonClicked: GlobalModels.presetParser.dolphPath = textfield.text
+            }
+
             FileDialog {
                 id: dolphinDialog
                 title: "select path to dolphin executable"
                 onAccepted: {
-                    GlobalModels.presetParser.setExecutablePath(file)
+                    GlobalModels.presetParser.setExecutablePath(currentFile)
             }
     }
 

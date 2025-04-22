@@ -8,6 +8,7 @@ import Qt.labs.platform
 import hex_launcher
 
 Window {
+    id: mainWindow
     width: 1000
     height: 800
     visible: true
@@ -21,6 +22,12 @@ Window {
             errorPopUp.openPopup(error_msg)
         }
     }
+
+    onClosing : {
+        GlobalModels.handleShutdown()
+    }
+
+    
 
     Sidebar{
         id: sidebar
@@ -83,102 +90,7 @@ Window {
         }
 
         initialItem: "qrc:/qt/qml/hex_launcher/ui/views/Presets.qml"
-
     }
-    
-
-    
-    
-
-    // ColumnLayout {
-    //     anchors.fill: parent
-
-    //     Text{
-    //         Layout.alignment: Qt.AlignHCenter
-    //         text: "mkwii game launcher"
-    //         font.bold: true
-    //         font.pointSize: 20
-    //         color: "white"
-    //     }
-
-
-
-
-    //     CButton {
-    //         buttonTextBold: true
-    //         buttonTextSize: 9
-    //         buttonText: "select dolphin executable"
-    //         Layout.alignment: Qt.AlignCenter
-
-    //         onButtonClicked: {
-    //             dolphinDialog.open()
-    //         }
-    //     }
-
-
-    //     Text{
-    //         id: dolphinPathText
-    //         Layout.alignment: Qt.AlignHCenter
-    //         Layout.preferredHeight: dolphinTextMetrics.height
-    //         text: GlobalModels.presetParser.dolphPath
-    //         font.bold: true
-    //         color: "white"
-
-    //         TextMetrics {
-    //             id: dolphinTextMetrics
-    //             text: dolphinPathText.text
-    //         }
-
-    //     }
-
-
-    //     CButton {
-    //         Layout.alignment: Qt.AlignHCenter
-    //         buttonText: "select mkwii file"
-    //         buttonTextSize: 9
-    //         buttonTextBold: true
-    //         onButtonClicked: {
-    //             mkwiiDialog.open()
-    //         }
-    //     }
-
-    //     Text{
-    //         id: mkwiiPathText
-    //         Layout.alignment: Qt.AlignHCenter
-    //         text: GlobalModels.presetParser.mkwiiPath
-    //         font.bold: true
-    //         Layout.preferredHeight: mkwiiTextMetrics.height
-    //         color: "white"
-
-    //         TextMetrics{
-    //             id: mkwiiTextMetrics
-    //             text: mkwiiPathText.text
-    //         }
-    //     }
-
-    //     CButton {
-    //         buttonText: "install RR"
-    //         onButtonClicked: GlobalModels.updater.checkAndUpdate()
-            
-    //     }
-    //     CButton{
-    //         buttonText: "add game preset"
-    //         buttonTextSize: 8
-    //         buttonTextColor: "white"
-
-    //         onButtonClicked: {
-    //             addPresetPopUp.openPopup()
-    //         }
-    //     }
-
-
-        
-
-    //     // Item {
-    //     //     Layout.fillHeight: true
-    //     // }
-    // }
-
 
     FileDialog {
         id: dolphinDialog
@@ -228,6 +140,100 @@ Window {
 
     AddPresetPopUp{
         id: addPresetPopUp
+    }
+
+
+    Rectangle {
+        id: slidingContainer
+        height: 70
+        
+        y: mainWindow.height - height
+        width: mainWindow.width
+
+        x: 0
+
+        color: "#434343"
+
+        topLeftRadius: 10
+        topRightRadius: 10
+
+        Connections{
+            target: GlobalModels
+
+            function onShowDlProgress(){
+                slidingContainer.state = "visible"
+                slidingLoader.setSource("qrc:/qt/qml/hex_launcher/ui/components/DownloadProgress.qml")
+                
+            }
+
+        }
+
+        Connections{
+            target: GlobalModels.updater
+            
+            function onModInstallFinished(){
+                closeTimer.start()
+            }
+        }
+
+        Timer{
+            id: closeTimer
+            interval: 2000
+            running: false
+            repeat: false
+            onTriggered: {
+                slidingContainer.state = "hidden"
+            }
+        }
+        
+        
+        Loader {
+            id: slidingLoader
+            anchors.fill: parent
+            source: ""  // Initially empty
+        }
+        
+        states: [
+            State {
+                name: "visible"
+                PropertyChanges {
+                    slidingContainer{
+                        y: mainWindow.height - slidingContainer.height
+                    }
+                }
+            },
+            State {
+                name: "hidden"
+                PropertyChanges {
+                    slidingContainer{
+                        y: mainWindow.height
+                    }
+                }
+            }
+        ]
+        
+        // Transitions for smooth animation
+        transitions: [
+            Transition {
+                from: "*"; to: "visible"
+                NumberAnimation { 
+                    property: "y"
+                    duration: 300
+                    easing.type: Easing.OutQuad
+                }
+            },
+            Transition {
+                from: "*"; to: "hidden"
+                NumberAnimation { 
+                    property: "y"
+                    duration: 300
+                    easing.type: Easing.InQuad
+                }
+            }
+        ]
+        
+        // Initialize to hidden state
+        state: "hidden"
     }
 
 }

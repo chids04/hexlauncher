@@ -49,6 +49,8 @@ public slots:
     void onBytesDownloaded(qint64 size);
 
     QString getLocalPath(const QUrl &path);
+    void downloadRR();
+    void handleShutdown();
 
 signals:
     void gamePresetModelChanged();
@@ -56,9 +58,9 @@ signals:
     void optionModelChanged();
     void updaterChanged();
     void gamesModelChanged();
-    void modFileSize(const QString &size);
-    void downloadProgress(const QString &size);
-
+    void modFileSize(double size);
+    void downloadProgress(double size);
+    void showDlProgress();
 
 private:
     GamePresetModel *m_gamePresetModel = nullptr;

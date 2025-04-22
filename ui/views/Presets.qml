@@ -15,7 +15,7 @@ Item{
 
     ColumnLayout{
         anchors.fill: parent
-
+        spacing: 0
         Text{
             Layout.alignment: Qt.AlignLeft
             text: "presets"
@@ -24,14 +24,27 @@ Item{
             color: "grey"
         }
 
-        CButton{
-            Layout.alignment: Qt.AlignLeft
-            buttonText: "+"
-            font.pointSize: 16
-            font.bold: true
+        RowLayout{
+            CButton{
+                Layout.alignment: Qt.AlignLeft
+                buttonText: "+"
+                font.pointSize: 16
+                font.bold: true
 
-            onButtonClicked: addPresetPopUp.openPopup()
+                onButtonClicked: addPresetPopUp.openPopup()
+            }
+
+            CButton{
+                Layout.alignment: Qt.AlignLeft
+                buttonText: "install retro rewind"
+                font.pointSize: 16
+                font.bold: true
+
+                onButtonClicked: GlobalModels.downloadRR()  
+
+            }
         }
+        
 
         GridView{
             id: presetGrid
@@ -40,7 +53,7 @@ Item{
             Layout.margins: 5
             model: GlobalModels.gamePresetModel
 
-            cellWidth: 400
+            cellWidth: 300
             cellHeight: 350
             clip: true
 
@@ -133,7 +146,7 @@ Item{
                                     required property string presetName
 
                                     height: 40
-                                    width: 200
+                                    width: optionList.width
                                     RowLayout{
                                         anchors.fill: parent
                                         Text{
@@ -301,11 +314,12 @@ Item{
                         RowLayout{
                             Layout.alignment: Qt.AlignHCenter
                             Layout.preferredHeight: childrenRect.height
+                            Layout.fillWidth: true
 
                             CButton{
                                 id: runBtn
                                 buttonText: "run game"
-                                buttonTextSize: 8
+                                buttonTextSize: 10
                                 Layout.alignment: Qt.AlignLeft
 
                                 onButtonClicked : {
@@ -319,7 +333,7 @@ Item{
                             CButton{
                                 id: saveBtn
                                 buttonText: "save settings"
-                                buttonTextSize: 8
+                                buttonTextSize: 10
                                 Layout.alignment: Qt.AlignRight
 
                                 onButtonClicked: {
@@ -343,8 +357,9 @@ Item{
 
                             CButton{
                                 id: saveLocation
-                                buttonText: "change save location"
-                                buttonTextSize: 8
+                                buttonText: "change save\nlocation"
+                                buttonTextSize: 10
+                                Layout.preferredWidth: 90
 
                                 onButtonClicked : {
                                     saveDialog.openDialog(presetDelegate.display_name, true)
@@ -364,13 +379,14 @@ Item{
                             onAccepted : {
                                 if(onlyPath){
                                     GlobalModels.gamePresetModel.setJsonPath(presetName, folder)
+                                    GlobalModels.presetParser.savePreset(presetName, folder, presetDelegate.gameIndex)
                                 }
                                 else{
                                     var status = GlobalModels.presetParser.savePreset(presetName, folder, presetDelegate.gameIndex)
                                 }
                             }
 
-                            function openDialog(preset_name, saveOnlyPath=false){
+                            function openDialog(preset_name: string, saveOnlyPath=false){
                                 if(saveOnlyPath){
                                     onlyPath = true
                                 }

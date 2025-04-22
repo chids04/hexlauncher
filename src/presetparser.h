@@ -44,7 +44,7 @@ public slots:
     int updatePreset(const QString &display_name, const QString &file_path, int gameIndex);
     void setGamePath(QUrl mkwii_path);
     void setExecutablePath(QUrl dolphin_executable);
-    int runGame(const QString &json_path, const QString &display_name, int gameIndex);
+    void runGame(const QString &json_path, const QString &display_name, int gameIndex);
 
 private:
     QHash<QString, int> selected_options;

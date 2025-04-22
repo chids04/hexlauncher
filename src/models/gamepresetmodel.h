@@ -29,6 +29,9 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     QVector<GamePreset*> getGamePresets() const;
     void updateJsonPath(int index, QString &json_path);
+    int getSize() const;
+    bool isUnique(const QString &display_name) const;
+    int getIndex(const QString &display_name) const;
     
 
 public slots:

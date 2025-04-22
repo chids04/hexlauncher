@@ -157,6 +157,31 @@ void GamePresetModel::updateJsonPath(int index, QString &json_path)
     qDebug() << "Updated json_path for preset:" << game_preset->getDisplayName() << json_path;
 }
 
+int GamePresetModel::getSize() const {
+    return game_presets.size();
+}
+
+bool GamePresetModel::isUnique(const QString &display_name) const {
+    for(const auto &preset : game_presets){
+        if(preset->getDisplayName() == display_name){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+int GamePresetModel::getIndex(const QString &display_name) const {
+    
+    for(int i=0; i<game_presets.size(); ++i){
+        if(game_presets[i]->getDisplayName() == display_name){
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 
 void GamePresetModel::setOptionChoice(int choice_idx, QString preset_name, int chosen_choice_idx)
 {

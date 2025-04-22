@@ -1,9 +1,12 @@
 #include "gamesmodel.h"
 
+#include <QSettings>
+
 
 GamesModel::GamesModel(QObject *parent)
     : QAbstractListModel(parent)
 {
+    loadFilesFromSettings();
 }
 
 int GamesModel::rowCount(const QModelIndex &parent) const {
@@ -32,6 +35,38 @@ QHash<int, QByteArray> GamesModel::roleNames() const {
     roles[FileNameRole] = "fileName";
     roles[FilePathRole] = "filePath";
     return roles;
+}
+
+void GamesModel::saveFilesToSettings() {
+    QSettings settings;
+    settings.beginGroup("GamesModel");
+    settings.beginWriteArray("files");
+    for (int i = 0; i < m_files.size(); ++i) {
+        settings.setArrayIndex(i);
+        settings.setValue("fileName", m_files[i].fileName);
+        settings.setValue("filePath", m_files[i].filePath);
+    }
+    settings.endArray();
+    settings.endGroup();
+}
+
+void GamesModel::loadFilesFromSettings() {
+    QSettings settings;
+    settings.beginGroup("GamesModel");
+    int size = settings.beginReadArray("files");
+    m_files.clear();
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        FileEntry entry;
+        entry.fileName = settings.value("fileName").toString();
+        entry.filePath = settings.value("filePath").toString();
+        m_files.append(entry);
+    }
+    settings.endArray();
+    settings.endGroup();
+    // Notify views that the model has changed
+    beginResetModel();
+    endResetModel();
 }
 
 void GamesModel::addFile(const QString &fileName, const QString &filePath) {

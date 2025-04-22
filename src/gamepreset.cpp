@@ -29,6 +29,7 @@ QString GamePreset::getJsonPath() const
     return json_path;
 }
 
+
 int GamePreset::getGameIndex() const {
     return gameIndex;
 }

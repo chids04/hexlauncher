@@ -41,21 +41,26 @@ void GlobalModels::hello()
 }
 
 void GlobalModels::onUpdaterFileSize(qint64 size) {
-    qint64 sizeInMB = size / (1024 * 1024);
-    QString m_fileSizeMB = QString::number(sizeInMB, 'f', 2) + " MB";
-
-    emit modFileSize(m_fileSizeMB);
+    double sizeInMB = static_cast<double>(size) / (1024 * 1024);
+    emit modFileSize(sizeInMB);
 }
 
 void GlobalModels::onBytesDownloaded(qint64 size) {
-    qint64 sizeInMB = size / (1024 * 1024);
-    QString m_fileSizeMB = QString::number(sizeInMB, 'f', 2) + " MB";
-
-    emit downloadProgress(m_fileSizeMB);
+    double sizeInMB = static_cast<double>(size) / (1024 * 1024);
+    emit downloadProgress(sizeInMB);
 }
 
 QString GlobalModels::getLocalPath(const QUrl &path) {
     return path.toLocalFile();
+}
+
+void GlobalModels::downloadRR() {
+    emit showDlProgress();
+    m_updater->checkAndUpdate();
+}
+
+void GlobalModels::handleShutdown() {
+    m_gamesModel->saveFilesToSettings();
 }
 
 
@@ -82,6 +87,7 @@ void GlobalModels::setUpdater(RetroRewind::Updater *newUpdater) {
     }
     m_updater = newUpdater;
     connect(m_updater, &RetroRewind::Updater::updateFileSize, this, &GlobalModels::onUpdaterFileSize);
+    connect(m_updater, &RetroRewind::Updater::bytesDownloaded, this, &GlobalModels::onBytesDownloaded);
     emit updaterChanged();
 }
 

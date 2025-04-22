@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QDir>
 #include <QUrl>
+#include <QtCore/qcoreapplication.h>
 #include <QtDebug>
 #include <QXmlStreamReader>
 #include <QJsonObject>
@@ -26,6 +27,15 @@ PresetParser::PresetParser(GamesModel *gamesModel, QObject *parent) :
 
     setMkwiiPath(settings.value("global/mkwiiPath", "").toString());
     setDolphPath(settings.value("global/dolphPath", "").toString());
+
+    if(m_dolphPath == ""){
+    #ifdef Q_OS_MAC
+        QString path = "/Applications/Dolphin.app/Contents/MacOS/Dolphin";
+        if (QFile::exists(path)) {
+            setDolphPath(path);
+        }
+    #endif
+    }
 }
 
 void PresetParser::writeToJson(QString game_path, QString save_location, QString preset_name)
@@ -49,16 +59,11 @@ void PresetParser::writeToJson(QString game_path, QString save_location, QString
     QJsonObject root_object;
     QString escaped_base_path = game_path;
 
+#ifdef Q_OS_WIN
     static const QRegularExpression separatorRegex(R"([\\/])");
-
     QStringList path_components = escaped_base_path.split(separatorRegex);
-
-    qDebug() << path_components;
-
     escaped_base_path = path_components.join(R"(\/)");
-
-    qDebug() << escaped_base_path;
-    //escaped_base_path.replace("/", "\\/");
+#endif
 
     root_object["base-file"] = escaped_base_path;
     root_object["display-name"] = preset_name;
@@ -71,12 +76,9 @@ void PresetParser::writeToJson(QString game_path, QString save_location, QString
     QJsonArray options_array;
 
     for(int i=0; i<num_choices; ++i){
-        //need to get the selected value
         QString option_name = options[i]->choiceName;
         QString section_name = options[i]->sectionName;
-
         int choice = options[i]->currentOption;
-        qDebug() << choice;
 
         options_array.append(QJsonObject{
             {"choice", choice},
@@ -86,12 +88,15 @@ void PresetParser::writeToJson(QString game_path, QString save_location, QString
     }
 
     QString escaped_sd_root = game_preset->getRoot();
+    QString escaped_xml = game_preset->getXmlPath();
+
+#ifdef Q_OS_WIN
     QStringList path_components_sd = escaped_sd_root.split(separatorRegex);
     escaped_sd_root = path_components_sd.join(R"(\/)");
 
-    QString escaped_xml = game_preset->getXmlPath();
     QStringList path_components_xml = escaped_xml.split(separatorRegex);
     escaped_xml = path_components_xml.join(R"(\/)");
+#endif
 
     patches_object["options"] = options_array;
     patches_object["root"] = escaped_sd_root;
@@ -109,7 +114,6 @@ void PresetParser::writeToJson(QString game_path, QString save_location, QString
 
     QString preset_path = QDir(save_location).absoluteFilePath(preset_name + ".json");
 
-    qDebug() << preset_path;
     QFile file(preset_path);
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning() << "Failed to open json file for writing:" << file.errorString();
@@ -126,6 +130,12 @@ void PresetParser::writeToJson(QString game_path, QString save_location, QString
 
 void PresetParser::parseRiivoXML(QUrl xml_path, QString display_name)
 {
+    //check if preset if same name already exists
+    bool isUnique = GlobalModels::s_singletonInstance->gamePresetModel()->isUnique(display_name);
+    if(!isUnique){
+        emit sendError("preset name must be unqiue");
+        return;
+    }
     //no need to check input, will do santiation in qml
     QString	xml_path_str = xml_path.toLocalFile();
 
@@ -212,6 +222,10 @@ void PresetParser::parseRiivoXML(QUrl xml_path, QString display_name)
     option_model->setOptions(option_list);
     GamePreset *gamePreset = new GamePreset(display_name, sd_root, option_model, section_name, xml_path_str);
     GlobalModels::s_singletonInstance->gamePresetModel()->addGamePreset(gamePreset);
+
+    
+
+
 }
 
 void PresetParser::addOption(QString option, int index)
@@ -240,6 +254,7 @@ int PresetParser::savePreset(const QString &display_name, const QUrl &save_path,
     QString game_path = gamesModel->getFilePath(gameIndex);
     QFileInfo fileInfo = QFileInfo(file_path);
     QFileInfo gameInfo = QFileInfo(game_path);
+
     
     if(!file_path.isEmpty()){
         if(!gameInfo.exists() || !gameInfo.isFile()){
@@ -277,7 +292,7 @@ int PresetParser::updatePreset(const QString &display_name, const QString &file_
     
     if(!file_path.isEmpty()){
         if(!gameInfo.exists() || !gameInfo.isFile()){
-            emit sendError("invalid game path, please select another one or create a new one");
+            emit sendError(", please select another one or create a new one");
             return -1;
         }
         else if(fileInfo.exists() && fileInfo.isFile()){
@@ -307,23 +322,34 @@ void PresetParser::setExecutablePath(QUrl dolphin_executable)
     setDolphPath(dolphin_executable.toLocalFile());
 }
 
-int PresetParser::runGame(const QString &json_path, const QString &display_name, int gameIndex)
+void PresetParser::runGame(const QString &json_path, const QString &display_name, int gameIndex)
 {
-    qDebug() << json_path;
 
     if(m_dolphPath == ""){
         emit sendError("select dolphin executable path in settings");
-        return 2;
+        return;
     }
 
     if(json_path == ""){
-        emit sendError("save preset before running");
-        
-        return 1;
+        //save in defualt location
+        QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/presets/" + display_name + "/";
+        QDir dir;
+        if (!dir.exists(baseDir)) {
+            dir.mkpath(baseDir);
+        }
+
+        int success = savePreset(display_name, QUrl::fromLocalFile(baseDir), gameIndex);
+        if(success!= 0){
+            emit sendError("error saving preset");
+            return;
+        }
+
+    }
+    else{
+        savePreset(display_name, json_path, gameIndex);
     }
 
     
-    savePreset(display_name, json_path, gameIndex);
     QStringList arguments;
     arguments << "-e" << json_path;
 
@@ -331,8 +357,9 @@ int PresetParser::runGame(const QString &json_path, const QString &display_name,
 
     if(!success){
         emit sendError("failed to start game, check dolphin executable path");
-        return -1;
+        return;
     }
+
 }
 
 
@@ -366,6 +393,7 @@ void PresetParser::setDolphPath(const QString &newDolphPath)
         return;
     m_dolphPath = newDolphPath;
     emit dolphPathChanged();
+    emit sendError("saved dolphin path");
 
     QSettings settings;
     settings.beginGroup("global");

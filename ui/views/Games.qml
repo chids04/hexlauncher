@@ -5,6 +5,8 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
+import hex_launcher
+
 Item {
     id: gamesView
 

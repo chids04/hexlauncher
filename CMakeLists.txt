@@ -34,6 +34,7 @@ qt_add_qml_module(apphex-launcher
         ui/components/AddPresetPopUp.qml
         ui/components/Sidebar.qml
         ui/components/CCombobox.qml
+        ui/components/DownloadProgress.qml
 
         ui/views/Presets.qml
         ui/views/Games.qml
@@ -50,14 +51,21 @@ qt_add_qml_module(apphex-launcher
     SOURCES
         src/presetparser.h src/presetparser.cpp
         src/gamepreset.h src/gamepreset.cpp
-        src/optionmodel.h src/optionmodel.cpp
-        src/gamepresetmodel.h src/gamepresetmodel.cpp
-        src/globalmodels.h src/globalmodels.cpp
         src/optionitem.h src/optionitem.cpp
+
+        src/models/optionmodel.h src/models/optionmodel.cpp
+        src/models/gamepresetmodel.h src/models/gamepresetmodel.cpp
+        src/models/globalmodels.h src/models/globalmodels.cpp
+        src/models/gamesmodel.h src/models/gamesmodel.cpp
+
         src/RRUpdater/updater.cpp
         src/RRUpdater/updater.h
-        src/gamesmodel.h
-        src/gamesmodel.cpp
+        src/utils/common.h
+
+        src/utils/unzipper.h
+
+
+        
 )
 
 if(WIN32)
@@ -82,5 +90,7 @@ target_link_libraries(apphex-launcher
 
 target_include_directories(apphex-launcher PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/models
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RRUpdater)
 
